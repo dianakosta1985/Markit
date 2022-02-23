@@ -1,22 +1,41 @@
 export interface Quote {
-    name: string,
-    symbol: Symbol,
-    lastPrice: number,
-    change:number,
-    changePercent: number,
-    timestamp: Date,
-    low: number,
-    hight: number,
-    open: number,
-    valume: number,
-    marketCap: number
+    Name: string,
+    Symbol: string,
+    LastPrice: number,
+    Change:number,
+    ChangePercent: number,
+    Timestamp: Date,
+    Low: number,
+    High: number,
+    Open: number,
+    Volume: number,
+    MarketCap: number
+}
+
+
+export const getRoundVal = (numb:number) => {
+  return Math.round((numb + Number.EPSILON) * 100) / 100;
+}
+
+export const convToInterCurrency =  (labelValue: number) => {
+
+  // Nine Zeroes for Billions
+  return Math.abs(Number(labelValue)) >= 1.0e+9
+
+  ? (Math.abs(Number(labelValue)) / 1.0e+9).toFixed(2) + "B"
+  // Six Zeroes for Millions 
+  : Math.abs(Number(labelValue)) >= 1.0e+6
+
+  ? (Math.abs(Number(labelValue)) / 1.0e+6).toFixed(2) + "M"
+  // Three Zeroes for Thousands
+  : Math.abs(Number(labelValue)) >= 1.0e+3
+
+  ? (Math.abs(Number(labelValue)) / 1.0e+3).toFixed(2) + "K"
+
+  : Math.abs(Number(labelValue));
 
 }
 
-interface Symbol{
-    label: string,
-    value: string
-}
 
 export const SymbolArr =  [
     {label:"MSFT", value:"MSFT"},

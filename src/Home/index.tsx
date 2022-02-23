@@ -1,44 +1,46 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Grid,
   IconButton,
-  InputBase,
   Typography,
   Paper,
   Autocomplete,
   TextField,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import { Quote, Theme, SymbolArr } from "../types/quote";
+import { Quote, Theme, SymbolArr, getRoundVal, convToInterCurrency } from "../types/quote";
 import moment from "moment-timezone";
 import { StyledGrid, StyledTypography } from "./style";
+import { getQuote } from "../API/quote";
 
-    const quote1: Quote = {
-    name: "Microsoft corp",
-    symbol: {label:"MSFT", value:"MSFT"},
-    lastPrice: 72.28,
-    change: 0.52,
-    changePercent: 0.72,
-    timestamp: new Date(),
-    low: 71.81,
-    hight: 72.89,
-    open: 71.97,
-    valume: 33.3, //M
-    marketCap: 558.0, //B
+    const initialState: Quote = {
+    Name: "",
+    Symbol: "",
+    LastPrice: 0,
+    Change: 0,
+    ChangePercent: 0,
+    Timestamp: new Date(),
+    Low: 0,
+    High: 0,
+    Open: 0,
+    Volume: 0, //M
+    MarketCap: 0, //B
     };
 
 const Home = () => {
+
+  useEffect(()=>{
+    CallOut(SymbolArr[0].label); 
+  },[])
   
-  const [quote, setQuote] = useState(quote1);
+  const [quote, setQuote] = useState(initialState);
   const handleInputChange = (event:  React.FormEvent<EventTarget>, value: string) => {
-    CallOut(); 
+    CallOut(value); 
   }
-    const CallOut = async() =>  {
-        debugger;
-        const url = "???"; //TBD  +?value
-        const responsePromise = await fetch(url);
-        const response = await responsePromise.json();
-        setQuote(response);
+    const CallOut = async(value: string) =>  {
+      const responsePromise = await getQuote(value);
+      //console.log(responsePromise.data);
+      setQuote(responsePromise.data);
     }    
   
   return (
@@ -66,7 +68,7 @@ const Home = () => {
             fontSize={"18px"}
             sx={{ textTransform: "uppercase" }}
           >
-            {`${quote.name} (${quote.symbol.label})`}
+            {`${quote.Name} (${quote.Symbol})`}
           </StyledTypography>
         </Grid>
         <Grid
@@ -77,25 +79,25 @@ const Home = () => {
           alignItems="baseline"
         >
           <StyledTypography paddingRight={"10px"} fontSize={"28px"}>
-            {quote.lastPrice}
+            {quote.LastPrice}
           </StyledTypography>
           <StyledTypography
             paddingRight={"5px"}
             fontSize={"20px"}
-            color={`${quote.change > 0 ?Theme.positiveColor: Theme.negativeColor}`}
+            color={`${quote.Change > 0 ?Theme.positiveColor: Theme.negativeColor}`}
           >
-            {`${quote.change > 0 ? "+" : quote.change < 0 ? "-" : ""}${
-              quote.change
+            {`${quote.Change > 0 ? "+" : ""}${
+              getRoundVal(quote.Change)
             }`}
           </StyledTypography>
           <StyledTypography
             paddingRight={"5px"}
             fontSize={"20px"}
-            color={`${quote.changePercent > 0 ?Theme.positiveColor: Theme.negativeColor}`}
+            color={`${quote.ChangePercent > 0 ?Theme.positiveColor: Theme.negativeColor}`}
           >
             {`(${
-              quote.changePercent > 0 ? "+" : quote.changePercent < 0 ? "-" : ""
-            }${quote.changePercent})%`}
+              quote.ChangePercent > 0 ? "+" : ""
+            }${getRoundVal(quote.ChangePercent)})%`}
           </StyledTypography>
         </Grid>
         <Grid item xs={12}>
@@ -107,26 +109,26 @@ const Home = () => {
           <StyledGrid item xs={12}>
             <Typography sx={{ color: `${Theme.mainColor}` }}>Range</Typography>
             <StyledTypography fontWeight={"600"}>
-              {`${quote.low} - ${quote.hight}`}
+              {`${quote.Low} - ${quote.High}`}
             </StyledTypography>
           </StyledGrid>
 
           <StyledGrid item xs={12}>
             <StyledTypography color={Theme.mainColor}>Open</StyledTypography>
-            <StyledTypography fontWeight={"600"}>{quote.open}</StyledTypography>
+            <StyledTypography fontWeight={"600"}>{quote.Open}</StyledTypography>
           </StyledGrid>
 
           <StyledGrid item xs={12}>
             <StyledTypography color={Theme.mainColor}>Valume</StyledTypography>
             <StyledTypography fontWeight={"600"}>
-              {quote.valume}
-            </StyledTypography>
+              {convToInterCurrency(quote.Volume)}
+            </StyledTypography> 
           </StyledGrid>
 
           <StyledGrid item xs={12} sx={{ borderBottom: `1px solid ${Theme.mainColor}` }}>
             <StyledTypography color={Theme.mainColor}>Market Cap</StyledTypography>
             <StyledTypography fontWeight={"600"}>
-              {quote.marketCap}
+              {convToInterCurrency(quote.MarketCap)}
             </StyledTypography>
           </StyledGrid>
         </Grid>
