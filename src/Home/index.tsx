@@ -24,7 +24,7 @@ import { getQuote } from "../API/quote";
     High: 0,
     Open: 0,
     Volume: 0, //M
-    MarketCap: 0, //B
+    MarketCap: null, //B
     };
 
 const Home = () => {
